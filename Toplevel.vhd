@@ -13,7 +13,7 @@ ENTITY TopLevel IS
 END TopLevel;
 
 
-ARCHITECTURE Behaviour OF TopLevel IS
+ARCHITECTURE Behavior OF TopLevel IS
 
 
 	SIGNAL AluOp:STD_LOGIC_VECTOR (2 DOWNTO 0);
