@@ -1,27 +1,47 @@
 library ieee;
 use ieee.std_logic_1164.all;
 
-ENTITY Comparator IS
-	PORT ( x,y : IN STD_LOGIC_VECTOR (3 DOWNTO 0);
-		AltB,AgtB,AeqB: OUT STD_LOGIC );
-END Comparator;
 
-ARCHITECTURE LogicFunc OF Comparator IS
-	SIGNAL i1,i2,i3,i0:STD_LOGIC;
-	SIGNAL AUX1,AUX2:STD_LOGIC;
-	
-BEGIN
+entity comparator4 is
 
-	i0 <= x(0) XNOR y(0);
-	i1 <= x(1) XNOR y(1);
-	i2 <= x(2) XNOR y(2);
-	i3 <= x(3) XNOR y(3);
-	AUX1 <= i0 AND i1 AND i2 AND i3;
-	AeqB <= AUX1;
+	port (
+		a, b : in std_logic_vector (3 downto 0); --entrada de 4 bits (operandos A e B)
+		equ  : out std_logic; -- 1 se A = B
+		grt  : out std_logic; -- 1 se A > B
+		lst  : out std_logic  -- 1 se A < B
+	);
+end comparator4;
+
+architecture LogicFunc of comparator4 is
+
+	signal i0, i1, i2, i3 : std_logic; -- Sinais auxiliares para igualdade
+	signal aux1, aux2 : std_logic;     -- aux1: igualdade total, aux2: A > B
+
+	begin
+
+-- Cada i(n) verifica se A(n) e B(n) são iguais
+-- XNOR retorna 1 se os bits forem iguais
+
+	i0 <= a(0) XNOR b(0);
+	i1 <= a(1) XNOR b(1);
+	i2 <= a(2) XNOR b(2);
+	i3 <= a(3) XNOR b(3);
 	
-	Aux2 <= (x(3) AND (NOT y(3))) OR (i3 AND (NOT y(2)) AND x(2)) OR (i3 AND i2 AND (NOT y(1)) AND x(1)) OR (i3 AND i2 AND i1 AND (NOT y(0)) AND x(0));
-	AgtB <= AUX2;
 	
-	Altb <= AUX1 NOR AUX2;
 	
-END LogicFunc;
+
+	aux1 <= i0 AND i1 AND i2 AND i3;
+	equ <= aux1; -- equ = 1 apenas se todos os bits forem iguais 
+
+	
+	-- Compara os bits de maneira prioritária , do MSB (a(3)) para o LSB (a(0))
+	
+	aux2 <= (a(3) AND (NOT b(3))) OR
+	        (i3 AND a(2) AND (NOT b(2))) OR
+	        (i3 AND i2 AND a(1) AND (NOT b(1))) OR
+	        (i3 AND i2 AND i1 AND a(0) AND (NOT b(0)));
+	grt <= aux2;
+
+	lst <= NOT (aux1 OR aux2); -- se A é diferente de B (aux=0) e também nao maior que B (aux=0), restando apenas que ele seja o menor
+	
+end LogicFunc;
